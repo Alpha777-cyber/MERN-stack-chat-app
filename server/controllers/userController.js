@@ -134,13 +134,18 @@ export const updateProfile = async (req, res) => {
     try {
         const { profilePic, bio, fullName } = req.body;
         const userId = req.user._id;
+
+        // Sanitize inputs
+        const sanitizedBio = sanitizeBio(bio);
+        const sanitizedFullName = sanitizeName(fullName);
+
         let updatedUser;
 
         if (!profilePic) {
-            updatedUser = await User.findByIdAndUpdate(userId, { bio, fullName }, { new: true });
+            updatedUser = await User.findByIdAndUpdate(userId, { bio: sanitizedBio, fullName: sanitizedFullName }, { new: true });
         } else {
             const upload = await cloudinary.uploader.upload(profilePic);
-            updatedUser = await User.findByIdAndUpdate(userId, { bio, fullName, profilePic: upload.secure_url }, { new: true });
+            updatedUser = await User.findByIdAndUpdate(userId, { bio: sanitizedBio, fullName: sanitizedFullName, profilePic: upload.secure_url }, { new: true });
         }
         res.json({ success: true, user: updatedUser });
     } catch (error) {

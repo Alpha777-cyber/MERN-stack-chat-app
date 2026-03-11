@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import Message from "../models/Message.js"
 import cloudinary from "../lib/cloudinary.js";
 import { io, userSocketMap } from "../lib/socket.js"
+import { sanitizeText } from "../lib/sanitize.js"
 
 
 //Get all users except the logged in user
@@ -101,7 +102,7 @@ export const sendMessage = async (req, res) => {
         const newMessage = await Message.create({
             senderId,
             receiverId,
-            text: text?.trim() || "",
+            text: sanitizeText(text) || "",
             image: imageUrl,
             seen: false
         });
